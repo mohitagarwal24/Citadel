@@ -66,21 +66,53 @@ export async function POST(req: NextRequest) {
 
     const body = await req.json();
 
+    // Log the incoming request body for debugging
+    console.log('📦 Creating product with data:', {
+      name: body.name,
+      category: body.category,
+      price: body.price,
+      stock: body.stock,
+      sku: body.sku,
+      imagesCount: body.images?.length || 0,
+      status: body.status,
+    });
+
     // Validate input
     const validation = productSchema.safeParse(body);
     if (!validation.success) {
+      console.error('❌ Product validation failed:', JSON.stringify(validation.error.errors, null, 2));
+
+      // Format validation errors for better user feedback
+      const formattedErrors = validation.error.errors.map(err => ({
+        field: err.path.join('.'),
+        message: err.message,
+        code: err.code,
+      }));
+
       return NextResponse.json(
-        { error: 'Validation failed', details: validation.error.errors },
+        {
+          error: 'Validation failed',
+          message: 'Please check the following fields and try again',
+          details: formattedErrors,
+          rawErrors: validation.error.errors
+        },
         { status: 400 }
       );
     }
+
+    console.log('✅ Validation passed successfully');
 
     await connectDB();
 
     // Check if SKU already exists
     const existingProduct = await Product.findOne({ sku: validation.data.sku });
     if (existingProduct) {
-      return NextResponse.json({ error: 'Product with this SKU already exists' }, { status: 400 });
+      console.error('❌ Duplicate SKU:', validation.data.sku);
+      return NextResponse.json({
+        error: 'Duplicate SKU',
+        message: `A product with SKU "${validation.data.sku}" already exists. Please use a different SKU.`,
+        field: 'sku'
+      }, { status: 400 });
     }
 
     // Create product
@@ -89,13 +121,38 @@ export async function POST(req: NextRequest) {
       createdBy: session.user.id,
     });
 
+    console.log('✅ Product created successfully:', product._id);
+
     return NextResponse.json(
       { message: 'Product created successfully', product },
       { status: 201 }
     );
-  } catch (error) {
-    console.error('Create product error:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  } catch (error: any) {
+    console.error('❌ Create product error:', error);
+    console.error('Error details:', {
+      name: error.name,
+      message: error.message,
+      stack: error.stack,
+    });
+
+    // Handle MongoDB validation errors
+    if (error.name === 'ValidationError') {
+      const validationErrors = Object.values(error.errors).map((err: any) => ({
+        field: err.path,
+        message: err.message,
+      }));
+
+      return NextResponse.json({
+        error: 'Database validation failed',
+        message: 'The product data failed database validation',
+        details: validationErrors
+      }, { status: 400 });
+    }
+
+    return NextResponse.json({
+      error: 'Internal server error',
+      message: 'An unexpected error occurred while creating the product. Please try again.'
+    }, { status: 500 });
   }
 }
 

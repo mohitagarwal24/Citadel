@@ -61,8 +61,8 @@ export default function ProductsPage() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-slate-900">Products</h1>
-            <p className="text-slate-600 mt-1">Manage your product inventory</p>
+            <h1 className="text-3xl font-bold text-slate-900 dark:text-white">Products</h1>
+            <p className="text-slate-600 dark:text-slate-400 mt-1">Manage your product inventory</p>
           </div>
           <Link href="/dashboard/products/new">
             <Button className="bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700">
@@ -132,16 +132,16 @@ export default function ProductsPage() {
                                 </div>
                               )}
                               <div>
-                                <p className="font-medium">{product.name}</p>
-                                <p className="text-sm text-slate-500 truncate max-w-xs">
+                                <p className="font-medium dark:text-white">{product.name}</p>
+                                <p className="text-sm text-slate-500 dark:text-slate-400 truncate max-w-xs">
                                   {product.description}
                                 </p>
                               </div>
                             </div>
                           </TableCell>
-                          <TableCell className="font-mono text-sm">{product.sku}</TableCell>
-                          <TableCell>{product.category}</TableCell>
-                          <TableCell>${product.price.toFixed(2)}</TableCell>
+                          <TableCell className="font-mono text-sm dark:text-slate-300">{product.sku}</TableCell>
+                          <TableCell className="dark:text-slate-300">{product.category}</TableCell>
+                          <TableCell className="dark:text-slate-300">${product.price.toFixed(2)}</TableCell>
                           <TableCell>
                             <span
                               className={`${
@@ -181,8 +181,8 @@ export default function ProductsPage() {
 
                 {/* Pagination */}
                 {data.pagination.pages > 1 && (
-                  <div className="flex items-center justify-between p-4 border-t">
-                    <p className="text-sm text-slate-600">
+                  <div className="flex items-center justify-between p-4 border-t dark:border-slate-700">
+                    <p className="text-sm text-slate-600 dark:text-slate-400">
                       Showing {(page - 1) * 10 + 1} to{' '}
                       {Math.min(page * 10, data.pagination.total)} of {data.pagination.total}{' '}
                       products
@@ -210,8 +210,8 @@ export default function ProductsPage() {
               </>
             ) : (
               <div className="text-center py-12">
-                <Package className="h-12 w-12 text-slate-300 mx-auto mb-4" />
-                <p className="text-slate-600 mb-4">No products found</p>
+                <Package className="h-12 w-12 text-slate-300 dark:text-slate-600 mx-auto mb-4" />
+                <p className="text-slate-600 dark:text-slate-400 mb-4">No products found</p>
                 <Link href="/dashboard/products/new">
                   <Button>Add your first product</Button>
                 </Link>

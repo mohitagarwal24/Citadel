@@ -73,8 +73,8 @@ export default function CreateAdminPage() {
             <Shield className="h-6 w-6 text-white" />
           </div>
           <div>
-            <h1 className="text-3xl font-bold text-slate-900">Create Admin</h1>
-            <p className="text-slate-600 mt-1">Add a new administrator to the system</p>
+            <h1 className="text-3xl font-bold text-slate-900 dark:text-white">Create Admin</h1>
+            <p className="text-slate-600 dark:text-slate-400 mt-1">Add a new administrator to the system</p>
           </div>
         </div>
 
@@ -83,13 +83,13 @@ export default function CreateAdminPage() {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
         >
-          <Card className="border-orange-200 bg-orange-50">
+          <Card className="border-orange-200 dark:border-orange-900 bg-orange-50 dark:bg-orange-950/30">
             <CardContent className="p-4">
               <div className="flex items-start space-x-3">
-                <Shield className="h-5 w-5 text-orange-600 mt-0.5" />
+                <Shield className="h-5 w-5 text-orange-600 dark:text-orange-400 mt-0.5" />
                 <div>
-                  <p className="font-semibold text-orange-900">Admin Access Only</p>
-                  <p className="text-sm text-orange-800 mt-1">
+                  <p className="font-semibold text-orange-900 dark:text-orange-300">Admin Access Only</p>
+                  <p className="text-sm text-orange-800 dark:text-orange-400 mt-1">
                     This feature is only visible to administrators. New admins will have full
                     access to all dashboard features including product management and user
                     administration.
@@ -106,11 +106,11 @@ export default function CreateAdminPage() {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
           >
-            <Card className="border-green-200 bg-green-50">
+            <Card className="border-green-200 dark:border-green-900 bg-green-50 dark:bg-green-950/30">
               <CardContent className="p-4">
                 <div className="flex items-center space-x-3">
-                  <CheckCircle2 className="h-5 w-5 text-green-600" />
-                  <p className="text-green-900 font-medium">
+                  <CheckCircle2 className="h-5 w-5 text-green-600 dark:text-green-400" />
+                  <p className="text-green-900 dark:text-green-300 font-medium">
                     Admin account created successfully!
                   </p>
                 </div>
@@ -219,21 +219,21 @@ export default function CreateAdminPage() {
             <CardTitle className="text-lg">Admin Privileges</CardTitle>
           </CardHeader>
           <CardContent>
-            <ul className="space-y-2 text-sm text-slate-600">
+            <ul className="space-y-2 text-sm text-slate-600 dark:text-slate-400">
               <li className="flex items-start space-x-2">
-                <CheckCircle2 className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
+                <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400 mt-0.5 flex-shrink-0" />
                 <span>Full access to product management (Create, Read, Update, Delete)</span>
               </li>
               <li className="flex items-start space-x-2">
-                <CheckCircle2 className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
+                <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400 mt-0.5 flex-shrink-0" />
                 <span>Access to dashboard analytics and reports</span>
               </li>
               <li className="flex items-start space-x-2">
-                <CheckCircle2 className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
+                <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400 mt-0.5 flex-shrink-0" />
                 <span>Ability to create additional admin accounts</span>
               </li>
               <li className="flex items-start space-x-2">
-                <CheckCircle2 className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
+                <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400 mt-0.5 flex-shrink-0" />
                 <span>Image upload and management capabilities</span>
               </li>
             </ul>

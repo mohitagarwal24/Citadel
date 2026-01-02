@@ -57,11 +57,29 @@ export function useCreateProduct() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
       });
+
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Failed to create product');
+        const errorData = await response.json();
+
+        // Create a detailed error message
+        let errorMessage = errorData.message || errorData.error || 'Failed to create product';
+
+        // If there are validation details, format them
+        if (errorData.details && Array.isArray(errorData.details)) {
+          const fieldErrors = errorData.details
+            .map((detail: any) => `${detail.field}: ${detail.message}`)
+            .join('\n');
+          errorMessage = `${errorMessage}\n\n${fieldErrors}`;
+        }
+
+        const error = new Error(errorMessage);
+        (error as any).details = errorData.details;
+        (error as any).field = errorData.field;
+        throw error;
       }
-      return response.json();
+
+      const result = await response.json();
+      return result;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['products'] });

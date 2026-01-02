@@ -59,7 +59,7 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 flex items-center justify-center p-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -159,9 +159,9 @@ export default function RegisterPage() {
             </form>
 
             <div className="mt-6 text-center text-sm">
-              <p className="text-slate-600">
+              <p className="text-slate-600 dark:text-slate-400">
                 Already have an account?{' '}
-                <Link href="/auth/login" className="text-indigo-600 hover:underline font-medium">
+                <Link href="/auth/login" className="text-indigo-600 dark:text-indigo-400 hover:underline font-medium">
                   Sign in
                 </Link>
               </p>
@@ -169,7 +169,7 @@ export default function RegisterPage() {
           </CardContent>
         </Card>
 
-        <p className="text-center text-sm text-slate-600 mt-4">
+        <p className="text-center text-sm text-slate-600 dark:text-slate-400 mt-4">
           <Link href="/" className="hover:underline">
             ← Back to home
           </Link>

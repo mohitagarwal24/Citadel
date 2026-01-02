@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import { ThemeToggle } from '@/components/theme/theme-toggle';
 import { 
   ShoppingBag, 
   BarChart3, 
@@ -11,7 +12,8 @@ import {
   TrendingUp, 
   Package,
   ArrowRight,
-  CheckCircle2
+  CheckCircle2,
+  Sparkles
 } from 'lucide-react';
 
 export default function HomePage() {
@@ -58,9 +60,9 @@ export default function HomePage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
       {/* Navigation */}
-      <nav className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-50">
+      <nav className="border-b bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm sticky top-0 z-50 dark:border-slate-800">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <motion.div
             initial={{ opacity: 0, x: -20 }}
@@ -75,14 +77,16 @@ export default function HomePage() {
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
-            className="flex items-center space-x-4"
+            className="flex items-center space-x-2 md:space-x-4"
           >
+            <ThemeToggle />
             <Link href="/auth/login">
-              <Button variant="ghost">Sign In</Button>
+              <Button variant="ghost" className="hidden sm:inline-flex">Sign In</Button>
             </Link>
             <Link href="/auth/register">
               <Button className="bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700">
-                Get Started
+                <span className="hidden sm:inline">Get Started</span>
+                <span className="sm:hidden">Start</span>
               </Button>
             </Link>
           </motion.div>
@@ -101,7 +105,7 @@ export default function HomePage() {
             <br />
             Dashboard
           </h1>
-          <p className="text-xl md:text-2xl text-slate-600 mb-8 max-w-3xl mx-auto">
+          <p className="text-xl md:text-2xl text-slate-600 dark:text-slate-300 mb-8 max-w-3xl mx-auto">
             Powerful server-rendered dashboard for managing your e-commerce products with
             real-time analytics and beautiful UI
           </p>
@@ -123,24 +127,41 @@ export default function HomePage() {
           </div>
         </motion.div>
 
-        {/* Hero Image/Illustration */}
+        {/* Hero Animated Cards */}
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.2 }}
-          className="mt-16 relative"
+          className="mt-16 relative max-w-5xl mx-auto"
         >
-          <div className="bg-gradient-to-r from-indigo-500 to-blue-500 rounded-2xl shadow-2xl p-8 max-w-5xl mx-auto">
-            <div className="bg-white rounded-lg p-6 shadow-xl">
-              <div className="grid grid-cols-3 gap-4 mb-4">
-                <div className="h-4 bg-slate-200 rounded"></div>
-                <div className="h-4 bg-slate-200 rounded"></div>
-                <div className="h-4 bg-slate-200 rounded"></div>
-              </div>
-              <div className="h-48 bg-gradient-to-br from-slate-100 to-slate-200 rounded-lg flex items-center justify-center">
-                <BarChart3 className="h-24 w-24 text-slate-400" />
-              </div>
-            </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[
+              { icon: BarChart3, label: 'Analytics', color: 'from-blue-500 to-indigo-500' },
+              { icon: Package, label: 'Products', color: 'from-purple-500 to-pink-500' },
+              { icon: TrendingUp, label: 'Sales', color: 'from-green-500 to-emerald-500' },
+            ].map((item, index) => (
+              <motion.div
+                key={item.label}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.3 + index * 0.1 }}
+                whileHover={{ scale: 1.05, rotate: 2 }}
+                className={`bg-gradient-to-br ${item.color} p-6 rounded-2xl shadow-xl`}
+              >
+                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 text-white">
+                  <item.icon className="h-12 w-12 mb-4 mx-auto" />
+                  <p className="text-lg font-semibold">{item.label}</p>
+                  <div className="mt-4 h-2 bg-white/20 rounded-full overflow-hidden">
+                    <motion.div
+                      initial={{ width: 0 }}
+                      animate={{ width: '100%' }}
+                      transition={{ duration: 1, delay: 0.5 + index * 0.2 }}
+                      className="h-full bg-white/60 rounded-full"
+                    />
+                  </div>
+                </div>
+              </motion.div>
+            ))}
           </div>
         </motion.div>
       </section>
@@ -157,7 +178,7 @@ export default function HomePage() {
           <h2 className="text-4xl md:text-5xl font-bold mb-4">
             Everything You Need
           </h2>
-          <p className="text-xl text-slate-600">
+          <p className="text-xl text-slate-600 dark:text-slate-400">
             Comprehensive features for modern e-commerce management
           </p>
         </motion.div>
@@ -171,20 +192,20 @@ export default function HomePage() {
               transition={{ duration: 0.5, delay: index * 0.1 }}
               viewport={{ once: true }}
               whileHover={{ scale: 1.05 }}
-              className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-all"
+              className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-lg hover:shadow-xl transition-all"
             >
               <div className="bg-gradient-to-br from-indigo-500 to-blue-500 w-12 h-12 rounded-lg flex items-center justify-center text-white mb-4">
                 {feature.icon}
               </div>
-              <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
-              <p className="text-slate-600">{feature.description}</p>
+              <h3 className="text-xl font-semibold mb-2 dark:text-white">{feature.title}</h3>
+              <p className="text-slate-600 dark:text-slate-400">{feature.description}</p>
             </motion.div>
           ))}
         </div>
       </section>
 
       {/* Benefits Section */}
-      <section className="bg-white py-20">
+      <section className="bg-white dark:bg-slate-900 py-20">
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <motion.div
@@ -193,10 +214,10 @@ export default function HomePage() {
               transition={{ duration: 0.5 }}
               viewport={{ once: true }}
             >
-              <h2 className="text-4xl font-bold mb-6">
+              <h2 className="text-4xl font-bold mb-6 dark:text-white">
                 Built for Modern E-commerce
               </h2>
-              <p className="text-lg text-slate-600 mb-8">
+              <p className="text-lg text-slate-600 dark:text-slate-400 mb-8">
                 Citadel provides all the tools you need to manage your products efficiently
                 with a beautiful, intuitive interface powered by the latest web technologies.
               </p>
@@ -211,7 +232,7 @@ export default function HomePage() {
                     className="flex items-center space-x-3"
                   >
                     <CheckCircle2 className="h-6 w-6 text-green-500 flex-shrink-0" />
-                    <span className="text-slate-700">{benefit}</span>
+                    <span className="text-slate-700 dark:text-slate-300">{benefit}</span>
                   </motion.div>
                 ))}
               </div>
@@ -224,20 +245,20 @@ export default function HomePage() {
               viewport={{ once: true }}
               className="relative"
             >
-              <div className="bg-gradient-to-br from-indigo-100 to-blue-100 rounded-2xl p-8 shadow-xl">
-                <div className="bg-white rounded-lg p-6 space-y-4">
+              <div className="bg-gradient-to-br from-indigo-100 to-blue-100 dark:from-indigo-900/30 dark:to-blue-900/30 rounded-2xl p-8 shadow-xl">
+                <div className="bg-white dark:bg-slate-800 rounded-lg p-6 space-y-4">
                   <div className="flex items-center justify-between">
-                    <div className="h-8 w-32 bg-slate-200 rounded"></div>
-                    <div className="h-8 w-8 bg-slate-200 rounded-full"></div>
+                    <div className="h-8 w-32 bg-slate-200 dark:bg-slate-700 rounded"></div>
+                    <div className="h-8 w-8 bg-slate-200 dark:bg-slate-700 rounded-full"></div>
                   </div>
                   <div className="space-y-3">
-                    <div className="h-4 bg-slate-200 rounded w-3/4"></div>
-                    <div className="h-4 bg-slate-200 rounded w-full"></div>
-                    <div className="h-4 bg-slate-200 rounded w-5/6"></div>
+                    <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-3/4"></div>
+                    <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-full"></div>
+                    <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-5/6"></div>
                   </div>
                   <div className="grid grid-cols-2 gap-4 pt-4">
-                    <div className="h-24 bg-gradient-to-br from-indigo-200 to-blue-200 rounded-lg"></div>
-                    <div className="h-24 bg-gradient-to-br from-blue-200 to-purple-200 rounded-lg"></div>
+                    <div className="h-24 bg-gradient-to-br from-indigo-200 to-blue-200 dark:from-indigo-700 dark:to-blue-700 rounded-lg"></div>
+                    <div className="h-24 bg-gradient-to-br from-blue-200 to-purple-200 dark:from-blue-700 dark:to-purple-700 rounded-lg"></div>
                   </div>
                 </div>
               </div>

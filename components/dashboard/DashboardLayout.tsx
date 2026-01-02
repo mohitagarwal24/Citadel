@@ -6,6 +6,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
+import { ThemeToggle } from '@/components/theme/theme-toggle';
 import {
   ShoppingBag,
   LayoutDashboard,
@@ -28,7 +29,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
 
   if (status === 'loading') {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
       </div>
     );
@@ -41,10 +42,10 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
 
   if (session?.user.role !== 'admin') {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950">
         <div className="text-center">
-          <h1 className="text-2xl font-bold mb-4">Access Denied</h1>
-          <p className="text-slate-600 mb-4">You need admin privileges to access this page.</p>
+          <h1 className="text-2xl font-bold mb-4 dark:text-white">Access Denied</h1>
+          <p className="text-slate-600 dark:text-slate-400 mb-4">You need admin privileges to access this page.</p>
           <Button onClick={() => router.push('/')}>Go Home</Button>
         </div>
       </div>
@@ -58,9 +59,9 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   ];
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
       {/* Top Navigation */}
-      <nav className="bg-white border-b sticky top-0 z-50">
+      <nav className="bg-white dark:bg-slate-900 border-b dark:border-slate-800 sticky top-0 z-50">
         <div className="px-4 py-3 flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <Button
@@ -79,10 +80,11 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
             </Link>
           </div>
 
-          <div className="flex items-center space-x-4">
-            <div className="hidden sm:block text-sm text-slate-600">
+          <div className="flex items-center space-x-2 md:space-x-4">
+            <div className="hidden sm:block text-sm text-slate-600 dark:text-slate-300">
               Welcome, <span className="font-semibold">{session.user.name}</span>
             </div>
+            <ThemeToggle />
             <Button
               variant="outline"
               size="sm"
@@ -100,7 +102,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
         {/* Sidebar */}
         <aside
           className={`
-            fixed lg:static inset-y-0 left-0 z-40 w-64 bg-white border-r transform transition-transform duration-200 ease-in-out
+            fixed lg:static inset-y-0 left-0 z-40 w-64 bg-white dark:bg-slate-900 border-r dark:border-slate-800 transform transition-transform duration-200 ease-in-out
             ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
             pt-16 lg:pt-0
           `}
@@ -120,7 +122,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                       ${
                         isActive
                           ? 'bg-gradient-to-r from-indigo-600 to-blue-600 text-white'
-                          : 'text-slate-600 hover:bg-slate-100'
+                          : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
                       }
                     `}
                   >

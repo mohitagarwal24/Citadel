@@ -5,11 +5,12 @@ import Product from '@/models/Product';
 import { productUpdateSchema } from '@/lib/validations/product';
 
 // GET single product by ID
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     await connectDB();
+    const { id } = await params;
 
-    const product = await Product.findById(params.id);
+    const product = await Product.findById(id);
 
     if (!product) {
       return NextResponse.json({ error: 'Product not found' }, { status: 404 });
@@ -23,7 +24,7 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
 }
 
 // UPDATE product by ID (Admin only)
-export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await auth();
 
@@ -32,6 +33,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
     }
 
     const body = await req.json();
+    const { id } = await params;
 
     // Validate input
     const validation = productUpdateSchema.safeParse(body);
@@ -45,7 +47,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
     await connectDB();
 
     // Check if product exists
-    const existingProduct = await Product.findById(params.id);
+    const existingProduct = await Product.findById(id);
     if (!existingProduct) {
       return NextResponse.json({ error: 'Product not found' }, { status: 404 });
     }
@@ -60,7 +62,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
 
     // Update product
     const product = await Product.findByIdAndUpdate(
-      params.id,
+      id,
       { $set: validation.data },
       { new: true, runValidators: true }
     );
@@ -73,7 +75,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
 }
 
 // DELETE product by ID (Admin only)
-export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await auth();
 
@@ -82,8 +84,9 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
     }
 
     await connectDB();
+    const { id } = await params;
 
-    const product = await Product.findByIdAndDelete(params.id);
+    const product = await Product.findByIdAndDelete(id);
 
     if (!product) {
       return NextResponse.json({ error: 'Product not found' }, { status: 404 });

@@ -2,15 +2,34 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { v2 as cloudinary } from 'cloudinary';
 
-// Configure Cloudinary
-cloudinary.config({
-  cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-});
+// Validate and configure Cloudinary
+const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+const apiKey = process.env.CLOUDINARY_API_KEY;
+const apiSecret = process.env.CLOUDINARY_API_SECRET;
+
+if (cloudName && apiKey && apiSecret) {
+  cloudinary.config({
+    cloud_name: cloudName,
+    api_key: apiKey,
+    api_secret: apiSecret,
+  });
+} else {
+  console.warn('⚠️ Cloudinary environment variables not set. Image uploads will fail.');
+}
 
 export async function POST(req: NextRequest) {
   try {
+    // Check Cloudinary configuration
+    if (!cloudName || !apiKey || !apiSecret) {
+      return NextResponse.json(
+        { 
+          error: 'Cloudinary not configured', 
+          message: 'Please set NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, and CLOUDINARY_API_SECRET in your .env.local file'
+        },
+        { status: 500 }
+      );
+    }
+
     const session = await auth();
 
     if (!session || session.user.role !== 'admin') {
@@ -49,6 +68,17 @@ export async function POST(req: NextRequest) {
 // DELETE image from Cloudinary
 export async function DELETE(req: NextRequest) {
   try {
+    // Check Cloudinary configuration
+    if (!cloudName || !apiKey || !apiSecret) {
+      return NextResponse.json(
+        { 
+          error: 'Cloudinary not configured', 
+          message: 'Please set NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, and CLOUDINARY_API_SECRET in your .env.local file'
+        },
+        { status: 500 }
+      );
+    }
+
     const session = await auth();
 
     if (!session || session.user.role !== 'admin') {

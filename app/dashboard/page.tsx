@@ -53,7 +53,7 @@ export default function DashboardPage() {
     },
     {
       title: 'Total Revenue',
-      value: `$${(stats?.totalRevenue || 0).toLocaleString()}`,
+      value: `$${(stats?.totalRevenue || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
       icon: DollarSign,
       color: 'from-green-500 to-green-600',
     },
@@ -78,12 +78,12 @@ export default function DashboardPage() {
       <div className="space-y-8">
         {/* Header */}
         <div>
-          <h1 className="text-3xl font-bold text-slate-900">Dashboard</h1>
-          <p className="text-slate-600 mt-1">Welcome to your admin dashboard</p>
+          <h1 className="text-3xl font-bold text-slate-900 dark:text-white">Dashboard</h1>
+          <p className="text-slate-600 dark:text-slate-400 mt-1">Welcome to your admin dashboard</p>
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
           {statCards.map((stat, index) => {
             const Icon = stat.icon;
             return (
@@ -97,8 +97,8 @@ export default function DashboardPage() {
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm text-slate-600 mb-1">{stat.title}</p>
-                        <p className="text-3xl font-bold">{stat.value}</p>
+                        <p className="text-sm text-slate-600 dark:text-slate-400 mb-1">{stat.title}</p>
+                        <p className="text-3xl font-bold dark:text-white">{stat.value}</p>
                       </div>
                       <div className={`bg-gradient-to-br ${stat.color} p-3 rounded-lg`}>
                         <Icon className="h-6 w-6 text-white" />
@@ -112,7 +112,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Charts */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
           {/* Sales Trend */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -127,10 +127,25 @@ export default function DashboardPage() {
                 {stats?.salesData && stats.salesData.length > 0 ? (
                   <ResponsiveContainer width="100%" height={300}>
                     <LineChart data={stats.salesData}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="date" />
-                      <YAxis />
-                      <Tooltip />
+                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                      <XAxis 
+                        dataKey="date" 
+                        tick={{ fontSize: 12, fill: 'hsl(var(--foreground))' }}
+                        stroke="hsl(var(--border))"
+                      />
+                      <YAxis 
+                        tick={{ fontSize: 12, fill: 'hsl(var(--foreground))' }}
+                        stroke="hsl(var(--border))"
+                      />
+                      <Tooltip 
+                        formatter={(value: number) => `$${value.toFixed(2)}`}
+                        contentStyle={{ 
+                          backgroundColor: 'hsl(var(--card))', 
+                          border: '1px solid hsl(var(--border))',
+                          borderRadius: '8px',
+                          color: 'hsl(var(--foreground))'
+                        }}
+                      />
                       <Legend />
                       <Line
                         type="monotone"
@@ -138,6 +153,8 @@ export default function DashboardPage() {
                         stroke="#6366f1"
                         strokeWidth={2}
                         name="Revenue ($)"
+                        dot={{ r: 4 }}
+                        activeDot={{ r: 6 }}
                       />
                       <Line
                         type="monotone"
@@ -145,11 +162,13 @@ export default function DashboardPage() {
                         stroke="#10b981"
                         strokeWidth={2}
                         name="Sales"
+                        dot={{ r: 4 }}
+                        activeDot={{ r: 6 }}
                       />
                     </LineChart>
                   </ResponsiveContainer>
                 ) : (
-                  <div className="h-[300px] flex items-center justify-center text-slate-400">
+                  <div className="h-[300px] flex items-center justify-center text-slate-400 dark:text-slate-500">
                     No sales data available
                   </div>
                 )}
@@ -185,11 +204,11 @@ export default function DashboardPage() {
                           <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                         ))}
                       </Pie>
-                      <Tooltip />
+                      <Tooltip contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '8px' }} />
                     </PieChart>
                   </ResponsiveContainer>
                 ) : (
-                  <div className="h-[300px] flex items-center justify-center text-slate-400">
+                  <div className="h-[300px] flex items-center justify-center text-slate-400 dark:text-slate-500">
                     No category data available
                   </div>
                 )}
@@ -210,19 +229,46 @@ export default function DashboardPage() {
               </CardHeader>
               <CardContent>
                 {stats?.topProducts && stats.topProducts.length > 0 ? (
-                  <ResponsiveContainer width="100%" height={300}>
-                    <BarChart data={stats.topProducts}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="name" />
-                      <YAxis />
-                      <Tooltip />
-                      <Legend />
-                      <Bar dataKey="revenue" fill="#6366f1" name="Revenue ($)" />
-                      <Bar dataKey="sales" fill="#10b981" name="Units Sold" />
+                  <ResponsiveContainer width="100%" height={350}>
+                    <BarChart 
+                      data={stats.topProducts}
+                      margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
+                    >
+                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                      <XAxis 
+                        dataKey="name" 
+                        angle={-45}
+                        textAnchor="end"
+                        height={100}
+                        interval={0}
+                        tick={{ fontSize: 12, fill: 'hsl(var(--foreground))' }}
+                        stroke="hsl(var(--border))"
+                      />
+                      <YAxis 
+                        tick={{ fontSize: 12, fill: 'hsl(var(--foreground))' }}
+                        stroke="hsl(var(--border))"
+                      />
+                      <Tooltip 
+                        formatter={(value: number, name: string) => {
+                          if (name === 'Revenue ($)') {
+                            return `$${value.toFixed(2)}`;
+                          }
+                          return value;
+                        }}
+                        contentStyle={{ 
+                          backgroundColor: 'hsl(var(--card))', 
+                          border: '1px solid hsl(var(--border))',
+                          borderRadius: '8px',
+                          color: 'hsl(var(--foreground))'
+                        }}
+                      />
+                      <Legend wrapperStyle={{ paddingTop: '20px' }} />
+                      <Bar dataKey="revenue" fill="#6366f1" name="Revenue ($)" radius={[8, 8, 0, 0]} />
+                      <Bar dataKey="sales" fill="#10b981" name="Units Sold" radius={[8, 8, 0, 0]} />
                     </BarChart>
                   </ResponsiveContainer>
                 ) : (
-                  <div className="h-[300px] flex items-center justify-center text-slate-400">
+                  <div className="h-[300px] flex items-center justify-center text-slate-400 dark:text-slate-500">
                     No product data available
                   </div>
                 )}

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { DashboardLayout } from '@/components/dashboard/DashboardLayout';
@@ -13,10 +13,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useProduct, useUpdateProduct } from '@/lib/hooks/useProducts';
 import { Loader2, ArrowLeft, Save } from 'lucide-react';
 
-export default function EditProductPage({ params }: { params: { id: string } }) {
+export default function EditProductPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
   const router = useRouter();
-  const { data, isLoading } = useProduct(params.id);
-  const updateProduct = useUpdateProduct(params.id);
+  const { data, isLoading } = useProduct(id);
+  const updateProduct = useUpdateProduct(id);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const [formData, setFormData] = useState({
@@ -78,8 +79,8 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <div>
-            <h1 className="text-3xl font-bold text-slate-900">Edit Product</h1>
-            <p className="text-slate-600 mt-1">Update product information</p>
+            <h1 className="text-3xl font-bold text-slate-900 dark:text-white">Edit Product</h1>
+            <p className="text-slate-600 dark:text-slate-400 mt-1">Update product information</p>
           </div>
         </div>
 
