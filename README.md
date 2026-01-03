@@ -6,6 +6,18 @@ A modern e-commerce admin dashboard built with Next.js 16, MongoDB, and Cloudina
 ![TypeScript](https://img.shields.io/badge/TypeScript-5+-blue?style=flat-square&logo=typescript)
 ![MongoDB](https://img.shields.io/badge/MongoDB-Latest-green?style=flat-square&logo=mongodb)
 
+Demo Video: https://youtu.be/SPcplesqvOw 
+
+Admin email: admin@citadel.com
+Admin password: Admin@123
+
+Additional Mail: mohitagarwal10a1@gmail.com
+Password: Citadel@123
+
+(Remember Mongo DB access is always with me so you cannot revoke admin rights from me technically 😅)
+
+<img width="959" height="473" alt="image" src="https://github.com/user-attachments/assets/b7151065-d90e-480a-9f8d-5fa0404cef2c" />
+
 ## Features
 
 **Authentication & Security**
