@@ -59,12 +59,17 @@ Open [http://localhost:3000](http://localhost:3000)
 
 ### First Admin Setup
 
-**Option 1:** Run seed script
+**Option 1 (Recommended):** Use the setup page
+```
+Visit http://localhost:3000/setup
+```
+
+**Option 2:** Run seed script
 ```bash
 npx tsx scripts/seed.ts
 ```
 
-**Option 2:** Register at `/auth/register` and update role in MongoDB:
+**Option 3:** Register at `/auth/register` and update role in MongoDB:
 ```javascript
 db.users.updateOne(
   { email: "your-email@example.com" },

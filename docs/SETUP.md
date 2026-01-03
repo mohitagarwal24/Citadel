@@ -105,13 +105,20 @@ openssl rand -base64 32
 
 Since this is a fresh setup, you need to create the first admin user.
 
-### Option A: Use the seed script
+### Option A: Use the Setup Page (Recommended)
+1. Start the app: `npm run dev`
+2. Go to `http://localhost:3000/setup`
+3. Fill in your admin details (name, email, password)
+4. Click "Create Admin Account"
+5. You'll be redirected to login
+
+### Option B: Use the seed script
 ```bash
 npx tsx scripts/seed.ts
 ```
 This creates a default admin with email `admin@citadel.com` and password `admin123`.
 
-### Option B: Register manually
+### Option C: Register and update manually
 1. Start the app: `npm run dev`
 2. Go to `http://localhost:3000/auth/register`
 3. Register a new account
@@ -123,6 +130,8 @@ This creates a default admin with email `admin@citadel.com` and password `admin1
      { $set: { role: "admin" } }
    )
    ```
+
+> **Note:** The `/setup` page only works if no admin exists yet. Once an admin is created, this page will show an error.
 
 ## Step 6: Run the Application
 

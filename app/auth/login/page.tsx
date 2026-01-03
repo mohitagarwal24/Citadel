@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { ShoppingBag, Loader2 } from 'lucide-react';
+import { ShoppingBag, Loader2, AlertCircle } from 'lucide-react';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -19,6 +19,29 @@ export default function LoginPage() {
     email: '',
     password: '',
   });
+
+  const getErrorMessage = (error: string): string => {
+    // Map common errors to user-friendly messages
+    if (error === 'CredentialsSignin') {
+      return 'Invalid email or password. Please check your credentials and try again.';
+    }
+    if (error.includes('403') || error.includes('Forbidden')) {
+      return 'Access denied. Please check if your account exists and has proper permissions.';
+    }
+    if (error.includes('401') || error.includes('Unauthorized')) {
+      return 'Authentication failed. Please verify your email and password.';
+    }
+    if (error.includes('429') || error.includes('Too Many')) {
+      return 'Too many login attempts. Please wait a minute and try again.';
+    }
+    if (error.includes('500') || error.includes('Server')) {
+      return 'Server error. Please try again later or contact support.';
+    }
+    if (error.includes('network') || error.includes('Network')) {
+      return 'Network error. Please check your internet connection.';
+    }
+    return error || 'An error occurred. Please try again.';
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,14 +57,15 @@ export default function LoginPage() {
       });
 
       if (result?.error) {
-        setError(result.error);
+        setError(getErrorMessage(result.error));
       } else if (result?.ok) {
-        // Wait a bit for session to be established
         await new Promise(resolve => setTimeout(resolve, 100));
         window.location.href = '/dashboard';
+      } else {
+        setError('Login failed. Please try again.');
       }
-    } catch (error) {
-      setError('An error occurred. Please try again.');
+    } catch (error: any) {
+      setError(getErrorMessage(error?.message || 'Network error'));
     } finally {
       setIsLoading(false);
     }
@@ -72,9 +96,16 @@ export default function LoginPage() {
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               {error && (
-                <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm">
-                  {error}
-                </div>
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="bg-red-50 dark:bg-red-950/50 border border-red-200 dark:border-red-800 px-4 py-3 rounded-lg"
+                >
+                  <div className="flex items-start gap-3">
+                    <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
+                    <p className="text-sm text-red-700 dark:text-red-300">{error}</p>
+                  </div>
+                </motion.div>
               )}
 
               <div className="space-y-2">
@@ -82,7 +113,7 @@ export default function LoginPage() {
                 <Input
                   id="email"
                   type="email"
-                  placeholder="admin@citadel.com"
+                  placeholder="you@example.com"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   required

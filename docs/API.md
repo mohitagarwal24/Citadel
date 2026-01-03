@@ -8,6 +8,8 @@ All protected endpoints require a valid session. The API uses NextAuth.js with J
 - `GET /api/products` - List products (public read)
 - `POST /api/auth/register` - User registration
 - `POST /api/auth/[...nextauth]` - NextAuth handlers
+- `GET /api/setup` - Check if setup is needed
+- `POST /api/setup` - Create first admin (only works if no admin exists)
 
 ### Protected Endpoints (Admin Only)
 - `POST /api/products` - Create product
