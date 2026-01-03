@@ -36,11 +36,11 @@ export default function SetupPage() {
             if (data.needsSetup) {
                 setNeedsSetup(true);
             } else {
-                // Already setup, redirect to login
-                router.push('/auth/login');
+                // Admin already exists, show message
+                setError('Setup already complete. An admin account exists. Please log in.');
             }
         } catch (error) {
-            setError('Failed to check setup status');
+            setError('Failed to connect to database. Please check your configuration.');
         } finally {
             setIsChecking(false);
         }

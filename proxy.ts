@@ -36,13 +36,22 @@ function getClientIP(req: NextRequest): string {
 function getAllowedOrigins(): string[] {
   const envOrigins = process.env.ALLOWED_ORIGINS;
   if (envOrigins) return envOrigins.split(',').map(o => o.trim());
-  if (process.env.NODE_ENV === 'production') return [];
+  // In production without explicit origins, allow same-origin requests
   return ['http://localhost:3000', 'http://127.0.0.1:3000'];
 }
 
-function isOriginAllowed(origin: string | null): boolean {
-  if (!origin) return true;
-  return getAllowedOrigins().includes(origin);
+function isOriginAllowed(origin: string | null, requestUrl: string): boolean {
+  if (!origin) return true; // Same-origin requests have no Origin header
+
+  // Check if origin matches the request URL (same-origin)
+  try {
+    const reqHost = new URL(requestUrl).origin;
+    if (origin === reqHost) return true;
+  } catch { }
+
+  const allowed = getAllowedOrigins();
+  if (allowed.length === 0) return true; // No restrictions if not configured
+  return allowed.includes(origin);
 }
 
 function getRateLimitType(pathname: string): 'auth' | 'upload' | 'default' {
@@ -76,7 +85,7 @@ function addSecurityHeaders(response: NextResponse, origin: string | null): Next
   response.headers.set('X-XSS-Protection', '1; mode=block');
   response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
 
-  if (origin && isOriginAllowed(origin)) {
+  if (origin && isOriginAllowed(origin, '')) {
     response.headers.set('Access-Control-Allow-Origin', origin);
     response.headers.set('Access-Control-Allow-Credentials', 'true');
   }
@@ -94,7 +103,7 @@ export async function proxy(request: NextRequest) {
     // Handle CORS preflight
     if (method === 'OPTIONS') {
       const response = new NextResponse(null, { status: 204 });
-      if (origin && isOriginAllowed(origin)) {
+      if (origin && isOriginAllowed(origin, request.url)) {
         response.headers.set('Access-Control-Allow-Origin', origin);
         response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
         response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
@@ -104,8 +113,8 @@ export async function proxy(request: NextRequest) {
       return response;
     }
 
-    // CORS check
-    if (origin && !isOriginAllowed(origin)) {
+    // CORS check (allow same-origin and configured origins)
+    if (origin && !isOriginAllowed(origin, request.url)) {
       return NextResponse.json({ error: 'CORS error: Origin not allowed' }, { status: 403 });
     }
 
@@ -123,8 +132,8 @@ export async function proxy(request: NextRequest) {
       return response;
     }
 
-    // Skip auth check for NextAuth routes
-    if (pathname.startsWith('/api/auth')) {
+    // Skip auth check for NextAuth and setup routes
+    if (pathname.startsWith('/api/auth') || pathname.startsWith('/api/setup')) {
       return addSecurityHeaders(NextResponse.next(), origin);
     }
 
@@ -152,6 +161,7 @@ export async function proxy(request: NextRequest) {
   if (
     pathname.startsWith('/_next') ||
     pathname.startsWith('/auth') ||
+    pathname.startsWith('/setup') ||
     pathname === '/' ||
     pathname.includes('.') ||
     !pathname.startsWith('/dashboard')
