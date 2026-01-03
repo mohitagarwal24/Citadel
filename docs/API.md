@@ -1,338 +1,209 @@
 # API Documentation
 
-## Base URL
-```
-http://localhost:3000/api
-```
-
 ## Authentication
 
-All protected endpoints require authentication via NextAuth.js session.
+All protected endpoints require a valid session. The API uses NextAuth.js with JWT tokens.
 
-### Login
-```http
-POST /api/auth/callback/credentials
-Content-Type: application/json
+### Public Endpoints
+- `GET /api/products` - List products (public read)
+- `POST /api/auth/register` - User registration
+- `POST /api/auth/[...nextauth]` - NextAuth handlers
 
-{
-  "email": "admin@citadel.com",
-  "password": "admin123"
-}
+### Protected Endpoints (Admin Only)
+- `POST /api/products` - Create product
+- `PUT /api/products/:id` - Update product
+- `DELETE /api/products/:id` - Delete product
+- `POST /api/admin/create` - Create admin user
+- `GET/PUT /api/users` - User management
+- `GET/PUT /api/profile` - Profile management
+- `POST/DELETE /api/upload` - Image upload
+- `GET /api/dashboard` - Analytics data
+
+## Rate Limiting
+
+| Endpoint Type | Limit | Window |
+|---------------|-------|--------|
+| Default | 100 requests | 1 minute |
+| Auth endpoints | 20 requests | 1 minute |
+| Upload | 10 requests | 1 minute |
+
+Rate limit headers included in responses:
+- `X-RateLimit-Limit`: Maximum requests allowed
+- `X-RateLimit-Remaining`: Requests remaining
+- `X-RateLimit-Reset`: Unix timestamp for reset
+
+## Endpoints
+
+### Products
+
+#### List Products
+```
+GET /api/products?page=1&limit=10&search=laptop&category=electronics
 ```
 
-### Register
-```http
-POST /api/auth/register
-Content-Type: application/json
-
-{
-  "name": "John Doe",
-  "email": "john@example.com",
-  "password": "password123",
-  "confirmPassword": "password123"
-}
-```
-
-**Response:**
+Response:
 ```json
 {
-  "message": "User registered successfully",
-  "user": {
-    "id": "...",
-    "name": "John Doe",
-    "email": "john@example.com",
-    "role": "user"
-  }
-}
-```
-
-## Products
-
-### Get All Products
-```http
-GET /api/products?page=1&limit=10&category=Electronics&status=active&search=laptop
-```
-
-**Query Parameters:**
-- `page` (optional): Page number (default: 1)
-- `limit` (optional): Items per page (default: 10)
-- `category` (optional): Filter by category
-- `status` (optional): Filter by status (active, inactive, out_of_stock)
-- `search` (optional): Search in name, description, SKU
-
-**Response:**
-```json
-{
-  "products": [
-    {
-      "_id": "...",
-      "name": "Wireless Headphones",
-      "description": "Premium headphones...",
-      "category": "Electronics",
-      "price": 149.99,
-      "stock": 50,
-      "images": ["https://..."],
-      "sku": "ELEC-001",
-      "status": "active",
-      "tags": ["audio", "wireless"],
-      "specifications": [
-        { "key": "Battery Life", "value": "30 hours" }
-      ],
-      "createdBy": "...",
-      "createdAt": "2024-01-01T00:00:00.000Z",
-      "updatedAt": "2024-01-01T00:00:00.000Z"
-    }
-  ],
+  "products": [...],
   "pagination": {
     "page": 1,
     "limit": 10,
-    "total": 100,
-    "pages": 10
+    "total": 50,
+    "pages": 5
   }
 }
 ```
 
-### Get Single Product
-```http
+#### Get Product
+```
 GET /api/products/:id
 ```
 
-**Response:**
-```json
+#### Create Product (Admin)
+```
+POST /api/products
+Content-Type: application/json
+
 {
-  "product": {
-    "_id": "...",
-    "name": "Wireless Headphones",
-    ...
-  }
+  "name": "Product Name",
+  "description": "Description",
+  "category": "electronics",
+  "price": 99.99,
+  "stock": 100,
+  "sku": "PROD-001",
+  "status": "active",
+  "images": ["https://..."],
+  "tags": ["tag1", "tag2"],
+  "specifications": [{"key": "Color", "value": "Black"}]
 }
 ```
 
-### Create Product (Admin Only)
-```http
-POST /api/products
+#### Update Product (Admin)
+```
+PUT /api/products/:id
 Content-Type: application/json
-Authorization: Required (Session)
 
+{ ...product fields... }
+```
+
+#### Delete Product (Admin)
+```
+DELETE /api/products/:id
+```
+
+### Users
+
+#### List Users (Admin)
+```
+GET /api/users
+```
+
+Response:
+```json
 {
-  "name": "New Product",
-  "description": "Product description",
-  "category": "Electronics",
-  "price": 99.99,
-  "stock": 100,
-  "images": ["https://..."],
-  "sku": "PROD-001",
-  "status": "active",
-  "tags": ["tag1", "tag2"],
-  "specifications": [
-    { "key": "Weight", "value": "500g" }
+  "users": [
+    {
+      "_id": "...",
+      "name": "User Name",
+      "email": "user@example.com",
+      "role": "admin",
+      "createdAt": "..."
+    }
   ]
 }
 ```
 
-**Response:**
-```json
-{
-  "message": "Product created successfully",
-  "product": { ... }
-}
+#### Update User Role (Admin)
 ```
-
-### Update Product (Admin Only)
-```http
-PUT /api/products/:id
+PUT /api/users
 Content-Type: application/json
-Authorization: Required (Session)
 
 {
-  "name": "Updated Product Name",
-  "price": 109.99,
-  "stock": 90
+  "userId": "user-id",
+  "role": "admin" | "user"
 }
 ```
 
-**Response:**
+### Profile
+
+#### Get Profile
+```
+GET /api/profile
+```
+
+#### Update Profile / Change Password
+```
+PUT /api/profile
+Content-Type: application/json
+
+{
+  "name": "New Name",
+  "currentPassword": "old-password",
+  "newPassword": "new-password"
+}
+```
+
+### Dashboard
+
+#### Get Analytics (Admin)
+```
+GET /api/dashboard
+```
+
+Response:
 ```json
 {
-  "message": "Product updated successfully",
-  "product": { ... }
+  "totalProducts": 50,
+  "totalRevenue": 10000.00,
+  "lowStockProducts": 5,
+  "recentSales": 25,
+  "salesData": [...],
+  "categoryDistribution": [...],
+  "topProducts": [...]
 }
 ```
 
-### Delete Product (Admin Only)
-```http
-DELETE /api/products/:id
-Authorization: Required (Session)
+### Upload
+
+#### Upload Image (Admin)
 ```
-
-**Response:**
-```json
-{
-  "message": "Product deleted successfully"
-}
-```
-
-## Image Upload
-
-### Upload Image (Admin Only)
-```http
 POST /api/upload
 Content-Type: multipart/form-data
-Authorization: Required (Session)
 
-file: <binary>
+file: <image file>
 ```
 
-**Response:**
+Response:
 ```json
 {
   "url": "https://res.cloudinary.com/...",
-  "publicId": "citadel-products/..."
+  "publicId": "citadel/..."
 }
 ```
 
-### Delete Image (Admin Only)
-```http
+#### Delete Image (Admin)
+```
 DELETE /api/upload
 Content-Type: application/json
-Authorization: Required (Session)
 
 {
-  "publicId": "citadel-products/..."
-}
-```
-
-**Response:**
-```json
-{
-  "message": "Image deleted successfully"
-}
-```
-
-## Dashboard Analytics
-
-### Get Dashboard Stats (Admin Only)
-```http
-GET /api/dashboard
-Authorization: Required (Session)
-```
-
-**Response:**
-```json
-{
-  "totalProducts": 100,
-  "totalRevenue": 15000.50,
-  "lowStockProducts": 5,
-  "recentSales": 25,
-  "salesData": [
-    {
-      "date": "2024-01-01",
-      "sales": 10,
-      "revenue": 500.00
-    }
-  ],
-  "categoryDistribution": [
-    {
-      "category": "Electronics",
-      "count": 50
-    }
-  ],
-  "topProducts": [
-    {
-      "name": "Product Name",
-      "sales": 100,
-      "revenue": 5000.00
-    }
-  ]
-}
-```
-
-## Admin Management
-
-### Create Admin (Admin Only)
-```http
-POST /api/admin/create
-Content-Type: application/json
-Authorization: Required (Session)
-
-{
-  "name": "New Admin",
-  "email": "newadmin@citadel.com",
-  "password": "securepassword"
-}
-```
-
-**Response:**
-```json
-{
-  "message": "Admin created successfully",
-  "admin": {
-    "id": "...",
-    "name": "New Admin",
-    "email": "newadmin@citadel.com",
-    "role": "admin"
-  }
+  "publicId": "citadel/..."
 }
 ```
 
 ## Error Responses
 
-All endpoints may return the following error responses:
-
-### 400 Bad Request
 ```json
 {
-  "error": "Validation failed",
-  "details": [
-    {
-      "field": "price",
-      "message": "Price must be a positive number"
-    }
-  ]
+  "error": "Error message here"
 }
 ```
 
-### 401 Unauthorized
-```json
-{
-  "error": "Authentication required"
-}
-```
-
-### 403 Forbidden
-```json
-{
-  "error": "Unauthorized - Admin access required"
-}
-```
-
-### 404 Not Found
-```json
-{
-  "error": "Product not found"
-}
-```
-
-### 500 Internal Server Error
-```json
-{
-  "error": "Internal server error"
-}
-```
-
-## Rate Limiting
-
-Currently, no rate limiting is implemented. For production deployment, consider implementing rate limiting using:
-- Vercel Edge Config
-- Redis-based rate limiting
-- API Gateway rate limiting
-
-## Webhooks (Future Feature)
-
-Planned webhook support for:
-- Product created
-- Product updated
-- Product deleted
-- Low stock alerts
-- Order notifications
-
+| Status | Meaning |
+|--------|---------|
+| 400 | Bad Request - Invalid input |
+| 401 | Unauthorized - Not authenticated |
+| 403 | Forbidden - Not authorized |
+| 404 | Not Found |
+| 429 | Too Many Requests |
+| 500 | Internal Server Error |

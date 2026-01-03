@@ -1,66 +1,45 @@
-# Setup Guide
+# Local Setup Guide
+
+Complete guide to set up Citadel locally with MongoDB and Cloudinary.
 
 ## Prerequisites
 
-Before you begin, ensure you have the following installed:
+- Node.js 18+
+- npm or yarn
+- Git
 
-- **Node.js** (v18 or higher)
-- **npm** or **yarn** or **pnpm**
-- **MongoDB** (local installation or MongoDB Atlas account)
-- **Git**
-
-## Installation Steps
-
-### 1. Clone the Repository
+## Step 1: Clone and Install
 
 ```bash
 git clone <repository-url>
 cd Citadel
-```
-
-### 2. Install Dependencies
-
-```bash
 npm install
-# or
-yarn install
-# or
-pnpm install
 ```
 
-### 3. Environment Variables
+## Step 2: MongoDB Setup
 
-Create a `.env.local` file in the root directory:
+### Option A: MongoDB Atlas (Recommended)
 
-```bash
-cp .env.example .env.local
-```
+1. Go to [MongoDB Atlas](https://www.mongodb.com/atlas)
+2. Create a free account and log in
+3. Click **Build a Database** → Select **FREE** tier
+4. Choose a cloud provider and region
+5. Create a database user:
+   - Username: `citadel_admin`
+   - Password: Generate a strong password (save it!)
+6. Click **Create User**
+7. Under **Network Access**, click **Add IP Address**
+   - For development: Click **Allow Access from Anywhere**
+   - For production: Add your server's IP
+8. Go to **Database** → Click **Connect** → **Connect your application**
+9. Copy the connection string:
+   ```
+   mongodb+srv://citadel_admin:<password>@cluster0.xxxxx.mongodb.net/citadel?retryWrites=true&w=majority
+   ```
 
-Update the following variables:
+### Option B: Local MongoDB
 
-```env
-# MongoDB Connection
-MONGODB_URI=mongodb://localhost:27017/citadel-ecommerce
-# For MongoDB Atlas: mongodb+srv://username:password@cluster.mongodb.net/citadel
-
-# NextAuth Configuration
-NEXTAUTH_URL=http://localhost:3000
-NEXTAUTH_SECRET=your-secret-key-min-32-characters-long
-
-# Cloudinary Configuration (Get from cloudinary.com)
-NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=your-cloud-name
-CLOUDINARY_API_KEY=your-api-key
-CLOUDINARY_API_SECRET=your-api-secret
-
-# App Configuration
-NODE_ENV=development
-```
-
-### 4. MongoDB Setup
-
-#### Option A: Local MongoDB
-
-1. Install MongoDB Community Edition
+1. Install MongoDB Community Server from [mongodb.com](https://www.mongodb.com/try/download/community)
 2. Start MongoDB service:
    ```bash
    # macOS
@@ -72,185 +51,109 @@ NODE_ENV=development
    # Windows
    net start MongoDB
    ```
+3. Connection string: `mongodb://localhost:27017/citadel`
 
-#### Option B: MongoDB Atlas (Cloud)
+## Step 3: Cloudinary Setup
 
-1. Create account at [mongodb.com/cloud/atlas](https://www.mongodb.com/cloud/atlas)
-2. Create a new cluster (free tier available)
-3. Get connection string and update `MONGODB_URI`
-4. Whitelist your IP address in Network Access
+1. Go to [Cloudinary](https://cloudinary.com/) and create a free account
+2. After login, go to **Dashboard**
+3. Find your credentials:
+   - **Cloud Name**: Your unique cloud name
+   - **API Key**: Your API key
+   - **API Secret**: Your API secret (click "Reveal" to see it)
+4. Create an upload preset (optional but recommended):
+   - Go to **Settings** → **Upload**
+   - Scroll to **Upload presets** → **Add upload preset**
+   - Set **Signing Mode** to "Unsigned" for client-side uploads
+   - Save the preset name
 
-### 5. Cloudinary Setup
+## Step 4: Environment Variables
 
-1. Create account at [cloudinary.com](https://cloudinary.com)
-2. Go to Dashboard
-3. Copy Cloud Name, API Key, and API Secret
-4. Update environment variables
+Create `.env.local` in the project root:
 
-### 6. Seed Database
+```bash
+cp .env.example .env.local
+```
 
-Populate the database with sample data and create admin user:
+Edit `.env.local` with your credentials:
 
+```env
+# MongoDB
+MONGODB_URI=mongodb+srv://citadel_admin:YOUR_PASSWORD@cluster0.xxxxx.mongodb.net/citadel?retryWrites=true&w=majority
+
+# NextAuth
+NEXTAUTH_URL=http://localhost:3000
+NEXTAUTH_SECRET=generate-a-32-char-secret-here-use-openssl
+AUTH_TRUST_HOST=true
+
+# Cloudinary
+NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=your-cloud-name
+CLOUDINARY_API_KEY=your-api-key
+CLOUDINARY_API_SECRET=your-api-secret
+
+# Security (optional - defaults work for development)
+ALLOWED_ORIGINS=http://localhost:3000
+```
+
+### Generate NEXTAUTH_SECRET
+
+```bash
+openssl rand -base64 32
+```
+
+## Step 5: Create First Admin
+
+Since this is a fresh setup, you need to create the first admin user.
+
+### Option A: Use the seed script
 ```bash
 npx tsx scripts/seed.ts
 ```
+This creates a default admin with email `admin@citadel.com` and password `admin123`.
 
-This will create:
-- Admin user (email: admin@citadel.com, password: admin123)
-- 10 sample products
-- 50 sample sales records
+### Option B: Register manually
+1. Start the app: `npm run dev`
+2. Go to `http://localhost:3000/auth/register`
+3. Register a new account
+4. Manually update the user role in MongoDB:
+   ```javascript
+   // In MongoDB Compass or Atlas
+   db.users.updateOne(
+     { email: "your-email@example.com" },
+     { $set: { role: "admin" } }
+   )
+   ```
 
-### 7. Run Development Server
+## Step 6: Run the Application
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+Open [http://localhost:3000](http://localhost:3000)
 
-## Default Credentials
+## Verification Checklist
 
-After seeding the database, use these credentials to login:
+- [ ] Can access the landing page
+- [ ] Can log in with admin credentials
+- [ ] Dashboard loads with charts (may be empty initially)
+- [ ] Can create a new product with image upload
+- [ ] Can access Settings page
+- [ ] Can access User Management page
 
-```
-Email: admin@citadel.com
-Password: admin123
-```
+## Troubleshooting
 
-## Project Structure
+### MongoDB Connection Failed
+- Check your connection string for typos
+- Ensure your IP is whitelisted in Atlas
+- Verify MongoDB service is running (local)
 
-```
-Citadel/
-├── app/                    # Next.js app directory
-│   ├── api/               # API routes
-│   ├── auth/              # Authentication pages
-│   ├── dashboard/         # Admin dashboard
-│   ├── layout.tsx         # Root layout
-│   ├── page.tsx           # Landing page
-│   └── providers.tsx      # React Query & Session providers
-├── components/            # React components
-│   ├── ui/               # Shadcn/ui components
-│   └── dashboard/        # Dashboard components
-├── lib/                   # Utility functions
-│   ├── db/               # Database connection
-│   ├── hooks/            # Custom React hooks
-│   ├── validations/      # Zod schemas
-│   └── auth.ts           # NextAuth config
-├── models/               # Mongoose models
-├── types/                # TypeScript types
-├── scripts/              # Utility scripts
-├── docs/                 # Documentation
-└── public/               # Static files
-```
+### Cloudinary Upload Failed
+- Verify Cloud Name, API Key, and API Secret
+- Check Cloudinary dashboard for error logs
+- Ensure you have upload permissions
 
-## Development Workflow
-
-### Running Tests
-
-```bash
-npm run test
-# or
-yarn test
-```
-
-### Building for Production
-
-```bash
-npm run build
-npm run start
-```
-
-### Linting
-
-```bash
-npm run lint
-```
-
-### Type Checking
-
-```bash
-npx tsc --noEmit
-```
-
-## Common Issues
-
-### MongoDB Connection Error
-
-**Problem:** Cannot connect to MongoDB
-
-**Solution:**
-1. Ensure MongoDB is running
-2. Check `MONGODB_URI` in `.env.local`
-3. For Atlas, verify IP whitelist and credentials
-
-### Cloudinary Upload Error
-
-**Problem:** Image upload fails
-
-**Solution:**
-1. Verify Cloudinary credentials in `.env.local`
-2. Check file size (max 10MB)
-3. Ensure file type is supported (jpg, png, gif, webp)
-
-### NextAuth Session Error
-
-**Problem:** Authentication not working
-
-**Solution:**
-1. Verify `NEXTAUTH_SECRET` is set (min 32 characters)
-2. Clear browser cookies
-3. Restart development server
-
-### Port Already in Use
-
-**Problem:** Port 3000 is already in use
-
-**Solution:**
-```bash
-# Kill process on port 3000
-# macOS/Linux
-lsof -ti:3000 | xargs kill -9
-
-# Windows
-netstat -ano | findstr :3000
-taskkill /PID <PID> /F
-
-# Or use different port
-PORT=3001 npm run dev
-```
-
-## Additional Configuration
-
-### Custom Port
-
-Create `.env.local`:
-```env
-PORT=3001
-```
-
-### Production Environment Variables
-
-For production deployment, ensure:
-1. Strong `NEXTAUTH_SECRET` (use: `openssl rand -base64 32`)
-2. Production MongoDB URI
-3. Proper CORS configuration
-4. Environment-specific URLs
-
-## Next Steps
-
-1. Explore the [API Documentation](./API.md)
-2. Review [Architecture](./ARCHITECTURE.md)
-3. Check [Features Documentation](./FEATURES.md)
-4. Read [Deployment Guide](./DEPLOYMENT.md)
-
-## Support
-
-For issues or questions:
-1. Check documentation in `/docs`
-2. Review GitHub issues
-3. Contact support team
-
+### NextAuth Errors
+- Ensure NEXTAUTH_SECRET is set (min 32 characters)
+- Verify NEXTAUTH_URL matches your dev server URL
+- Clear browser cookies and try again
