@@ -6,17 +6,29 @@ A modern e-commerce admin dashboard built with Next.js 16, MongoDB, and Cloudina
 ![TypeScript](https://img.shields.io/badge/TypeScript-5+-blue?style=flat-square&logo=typescript)
 ![MongoDB](https://img.shields.io/badge/MongoDB-Latest-green?style=flat-square&logo=mongodb)
 
-Demo Video: https://youtu.be/SPcplesqvOw 
+## Live Demo
 
-Admin email: admin@citadel.com
-Admin password: Admin@123
+**Live Application:** [https://citadel-eight-alpha.vercel.app](https://citadel-eight-alpha.vercel.app)
 
-Additional Mail: mohitagarwal10a1@gmail.com
-Password: Citadel@123
+**Demo Video:** [https://youtu.be/SPcplesqvOw](https://youtu.be/SPcplesqvOw)
 
-(Remember Mongo DB access is always with me so you cannot revoke admin rights from me technically 😅)
+### Demo Credentials
 
-<img width="959" height="473" alt="image" src="https://github.com/user-attachments/assets/b7151065-d90e-480a-9f8d-5fa0404cef2c" />
+| Email | Password |
+|-------|----------|
+| admin@citadel.com | Admin@123 |
+| mohitagarwal10a1@gmail.com | Citadel@123 |
+
+<img width="959" height="473" alt="Dashboard Preview" src="https://github.com/user-attachments/assets/b7151065-d90e-480a-9f8d-5fa0404cef2c" />
+
+### Documentation
+
+| Document | Description |
+|----------|-------------|
+| [Setup Guide](./docs/SETUP.md) | Local development with MongoDB & Cloudinary |
+| [API Reference](./docs/API.md) | All endpoints, rate limits, responses |
+| [Security](./docs/SECURITY.md) | Auth, CORS, headers, rate limiting |
+| [Architecture](./docs/ARCHITECTURE.md) | System design, data flow, schemas |
 
 ## Features
 
@@ -145,13 +157,6 @@ Citadel/
 - **Charts:** Recharts
 - **Animations:** Framer Motion
 - **File Storage:** Cloudinary
-
-## Documentation
-
-- [Setup Guide](./docs/SETUP.md) - Local development setup
-- [API Reference](./docs/API.md) - Endpoints and usage
-- [Security](./docs/SECURITY.md) - Security features
-- [Architecture](./docs/ARCHITECTURE.md) - Technical design
 
 ## API Endpoints
 
