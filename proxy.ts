@@ -142,9 +142,15 @@ export async function proxy(request: NextRequest) {
       (pathname.startsWith('/api/products') && PROTECTED_PRODUCT_METHODS.includes(method));
 
     if (requiresAuth) {
-      const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
+      // Try to get token - NextAuth uses different cookie names in production
+      const token = await getToken({
+        req: request,
+        secret: process.env.NEXTAUTH_SECRET,
+        secureCookie: process.env.NODE_ENV === 'production',
+      });
 
       if (!token) {
+        console.log('Auth failed: No token found. Cookies:', request.cookies.getAll().map(c => c.name));
         return NextResponse.json({ error: 'Unauthorized - Authentication required' }, { status: 401 });
       }
 
