@@ -7,7 +7,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Loader2, UserPlus, Shield, CheckCircle2 } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Loader2, UserPlus, Shield, CheckCircle2, Info } from 'lucide-react';
 
 export default function CreateAdminPage() {
   const [isLoading, setIsLoading] = useState(false);
@@ -190,10 +191,10 @@ export default function CreateAdminPage() {
                 />
               </div>
 
-              <div className="pt-4">
+              <div className="pt-4 flex items-center gap-3">
                 <Button
                   type="submit"
-                  className="w-full bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700"
+                  className="flex-1 bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700"
                   disabled={isLoading}
                 >
                   {isLoading ? (
@@ -208,35 +209,29 @@ export default function CreateAdminPage() {
                     </>
                   )}
                 </Button>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button
+                        type="button"
+                        className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                      >
+                        <Info className="h-5 w-5 text-slate-500" />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent side="left" className="max-w-xs p-3">
+                      <p className="font-semibold mb-2">Admin Privileges</p>
+                      <ul className="space-y-1 text-xs">
+                        <li>• Full product management (CRUD)</li>
+                        <li>• Dashboard analytics access</li>
+                        <li>• Create admin accounts</li>
+                        <li>• Image upload capabilities</li>
+                      </ul>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               </div>
             </form>
-          </CardContent>
-        </Card>
-
-        {/* Info Card */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">Admin Privileges</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ul className="space-y-2 text-sm text-slate-600 dark:text-slate-400">
-              <li className="flex items-start space-x-2">
-                <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400 mt-0.5 flex-shrink-0" />
-                <span>Full access to product management (Create, Read, Update, Delete)</span>
-              </li>
-              <li className="flex items-start space-x-2">
-                <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400 mt-0.5 flex-shrink-0" />
-                <span>Access to dashboard analytics and reports</span>
-              </li>
-              <li className="flex items-start space-x-2">
-                <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400 mt-0.5 flex-shrink-0" />
-                <span>Ability to create additional admin accounts</span>
-              </li>
-              <li className="flex items-start space-x-2">
-                <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400 mt-0.5 flex-shrink-0" />
-                <span>Image upload and management capabilities</span>
-              </li>
-            </ul>
           </CardContent>
         </Card>
       </div>

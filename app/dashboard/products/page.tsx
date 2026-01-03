@@ -112,7 +112,7 @@ export default function ProductsPage() {
                     <TableBody>
                       {data.products.map((product, index) => (
                         <motion.tr
-                          key={product._id}
+                          key={product._id.toString()}
                           initial={{ opacity: 0, y: 10 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ duration: 0.2, delay: index * 0.05 }}
@@ -144,9 +144,8 @@ export default function ProductsPage() {
                           <TableCell className="dark:text-slate-300">${product.price.toFixed(2)}</TableCell>
                           <TableCell>
                             <span
-                              className={`${
-                                product.stock < 10 ? 'text-red-600 font-semibold' : ''
-                              }`}
+                              className={`${product.stock < 10 ? 'text-red-600 font-semibold' : ''
+                                }`}
                             >
                               {product.stock}
                             </span>
@@ -166,7 +165,7 @@ export default function ProductsPage() {
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                onClick={() => setDeleteId(product._id)}
+                                onClick={() => setDeleteId(product._id.toString())}
                                 className="text-red-600 hover:text-red-700 hover:bg-red-50"
                               >
                                 <Trash2 className="h-4 w-4" />

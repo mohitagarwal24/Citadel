@@ -11,7 +11,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useProduct, useUpdateProduct } from '@/lib/hooks/useProducts';
-import { Loader2, ArrowLeft, Save } from 'lucide-react';
+import { Loader2, ArrowLeft, Save, Upload, X, Image as ImageIcon } from 'lucide-react';
+import Image from 'next/image';
 
 export default function EditProductPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -19,6 +20,8 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
   const { data, isLoading } = useProduct(id);
   const updateProduct = useUpdateProduct(id);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [uploading, setUploading] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -28,6 +31,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
     stock: '',
     sku: '',
     status: 'active' as 'active' | 'inactive' | 'out_of_stock',
+    images: [] as string[],
   });
 
   useEffect(() => {
@@ -40,6 +44,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
         stock: data.product.stock.toString(),
         sku: data.product.sku,
         status: data.product.status,
+        images: data.product.images || [],
       });
     }
   }, [data]);
@@ -57,6 +62,82 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
       router.push('/dashboard/products');
     } catch (error: any) {
       setErrors({ general: error.message || 'Failed to update product' });
+    }
+  };
+
+  const removeImage = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      images: prev.images.filter((_, i) => i !== index),
+    }));
+  };
+
+  // Drag and drop handlers
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleDrop = async (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+
+    const files = e.dataTransfer.files;
+    if (files.length > 0) {
+      await processFiles(files);
+    }
+  };
+
+  const processFiles = async (files: FileList) => {
+    setUploading(true);
+    setErrors(prev => ({ ...prev, images: '' }));
+
+    try {
+      for (const file of Array.from(files)) {
+        if (!file.type.startsWith('image/')) {
+          setErrors(prev => ({ ...prev, images: 'Please select an image file' }));
+          continue;
+        }
+
+        if (file.size > 10 * 1024 * 1024) {
+          setErrors(prev => ({ ...prev, images: 'Image must be less than 10MB' }));
+          continue;
+        }
+
+        const formDataUpload = new FormData();
+        formDataUpload.append('file', file);
+
+        const response = await fetch('/api/upload', {
+          method: 'POST',
+          body: formDataUpload,
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to upload image');
+        }
+
+        const data = await response.json();
+        setFormData(prev => ({
+          ...prev,
+          images: [...prev.images, data.url],
+        }));
+      }
+    } catch (error: any) {
+      setErrors(prev => ({ ...prev, images: error.message || 'Failed to upload image' }));
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files && files.length > 0) {
+      await processFiles(files);
     }
   };
 
@@ -178,6 +259,87 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                     <SelectItem value="out_of_stock">Out of Stock</SelectItem>
                   </SelectContent>
                 </Select>
+              </div>
+
+              {/* Images Section */}
+              <div className="space-y-4">
+                <Label>Product Images</Label>
+
+                {/* Current Images */}
+                {formData.images.length > 0 && (
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    {formData.images.map((image, index) => (
+                      <div key={index} className="relative group aspect-square">
+                        <Image
+                          src={image}
+                          alt={`Product image ${index + 1}`}
+                          fill
+                          className="object-cover rounded-lg"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => removeImage(index)}
+                          className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          <X className="h-4 w-4" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Upload Zone with Drag & Drop */}
+                <div
+                  onDragOver={handleDragOver}
+                  onDragLeave={handleDragLeave}
+                  onDrop={handleDrop}
+                  className={`border-2 border-dashed rounded-lg p-6 text-center transition-all ${isDragging
+                      ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20'
+                      : 'hover:border-indigo-400'
+                    }`}
+                >
+                  <input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={handleImageUpload}
+                    disabled={uploading}
+                    className="hidden"
+                    id="image-upload"
+                  />
+                  <label
+                    htmlFor="image-upload"
+                    className="cursor-pointer flex flex-col items-center"
+                  >
+                    {uploading ? (
+                      <>
+                        <Loader2 className="h-8 w-8 text-indigo-600 animate-spin mb-2" />
+                        <p className="text-sm text-slate-600 dark:text-slate-400">Uploading...</p>
+                      </>
+                    ) : isDragging ? (
+                      <>
+                        <Upload className="h-8 w-8 text-indigo-600 mb-2" />
+                        <p className="text-sm font-medium text-indigo-600">
+                          Drop images here
+                        </p>
+                      </>
+                    ) : (
+                      <>
+                        <Upload className="h-8 w-8 text-slate-400 mb-2" />
+                        <p className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                          Drag & drop images or click to upload
+                        </p>
+                        <p className="text-xs text-slate-500 mt-1">
+                          PNG, JPG up to 10MB
+                        </p>
+                      </>
+                    )}
+                  </label>
+                </div>
+
+                {errors.images && (
+                  <p className="text-sm text-red-600">{errors.images}</p>
+                )}
               </div>
 
               <div className="flex justify-end space-x-4 pt-6 border-t">

@@ -127,12 +127,6 @@ export default function LoginPage() {
                 </Link>
               </p>
             </div>
-
-            <div className="mt-6 p-4 bg-slate-50 dark:bg-slate-800 rounded-lg">
-              <p className="text-xs text-slate-600 dark:text-slate-400 font-semibold mb-2">Demo Credentials:</p>
-              <p className="text-xs text-slate-500 dark:text-slate-400">Email: admin@citadel.com</p>
-              <p className="text-xs text-slate-500 dark:text-slate-400">Password: admin123</p>
-            </div>
           </CardContent>
         </Card>
 

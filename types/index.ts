@@ -1,8 +1,7 @@
-import { Document } from 'mongoose';
+import { Document, Types } from 'mongoose';
 
 // User/Admin Types
 export interface IUser extends Document {
-  _id: string;
   name: string;
   email: string;
   password: string;
@@ -13,7 +12,6 @@ export interface IUser extends Document {
 
 // Product Types
 export interface IProduct extends Document {
-  _id: string;
   name: string;
   description: string;
   category: string;
@@ -27,15 +25,14 @@ export interface IProduct extends Document {
     key: string;
     value: string;
   }[];
-  createdBy: string;
+  createdBy: Types.ObjectId | string;
   createdAt: Date;
   updatedAt: Date;
 }
 
 // Sales/Analytics Types
 export interface ISale extends Document {
-  _id: string;
-  productId: string;
+  productId: Types.ObjectId | string;
   quantity: number;
   totalAmount: number;
   date: Date;

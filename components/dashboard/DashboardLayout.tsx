@@ -14,6 +14,8 @@ import {
   UserPlus,
   LogOut,
   Menu,
+  Settings,
+  Users,
 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -55,7 +57,9 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   const navItems = [
     { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
     { href: '/dashboard/products', icon: Package, label: 'Products' },
+    { href: '/dashboard/users', icon: Users, label: 'User Management' },
     { href: '/dashboard/admin', icon: UserPlus, label: 'Create Admin' },
+    { href: '/dashboard/settings', icon: Settings, label: 'Settings' },
   ];
 
   return (
@@ -119,10 +123,9 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                     whileTap={{ scale: 0.98 }}
                     className={`
                       flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors
-                      ${
-                        isActive
-                          ? 'bg-gradient-to-r from-indigo-600 to-blue-600 text-white'
-                          : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+                      ${isActive
+                        ? 'bg-gradient-to-r from-indigo-600 to-blue-600 text-white'
+                        : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
                       }
                     `}
                   >
